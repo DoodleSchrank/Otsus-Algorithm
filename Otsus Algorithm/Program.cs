@@ -10,6 +10,7 @@ namespace Otsus_Algorithm
 
     class Program
     {
+        private static bool logEverything = false;
         private static int lightmax = 256;
         private static double[] lightlevels = new double[lightmax];
         private static string path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -41,6 +42,7 @@ namespace Otsus_Algorithm
                         histogram.SetPixel(x, y, Color.White);
                     }
                 }
+                // Searches highest % for scaling in histogram
                 int ll = 0;
                 double maxp = 0.0;
                 foreach(double val in lightlevels)
@@ -48,7 +50,8 @@ namespace Otsus_Algorithm
                     if (val > maxp) maxp = val;
                 }
                 Console.WriteLine("Maxp: " + maxp);
-                // Rework!!
+
+                // Creates Histogram
                 foreach (double val in lightlevels)
                 {
                     for (int j = 0; j < 4; j++)
@@ -61,7 +64,7 @@ namespace Otsus_Algorithm
                     ll += 4;
                 }
 
-                // Otsu
+                // Otsu, maximizes effectiveness
                 int bestThreshhold = 0;
                 double bestEffectiveness = 0;
                 double eff;
@@ -73,16 +76,18 @@ namespace Otsus_Algorithm
                         bestEffectiveness = eff;
                         bestThreshhold = i;
                     }
-                    //Console.WriteLine();
                 }
 
-                // Image Save
                 int c;
+
+                // Fix indexed Pixels
                 Bitmap otsufied = new Bitmap(img.Width, img.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
                 using (Graphics gr = Graphics.FromImage(otsufied))
                 {
                     gr.DrawImage(img, new Rectangle(0, 0, otsufied.Width, otsufied.Height));
                 }
+
+                // Create binary image
                 for (int y = 0; y < otsufied.Height; y++)
                 {
                     for (int x = 0; x < otsufied.Width; x++)
@@ -98,6 +103,8 @@ namespace Otsus_Algorithm
                         }
                     }
                 }
+                otsufied.Save(path + "\\" + Path.GetFileNameWithoutExtension(filename) + "-otsufied" + Path.GetExtension(filename));
+
                 // Threshhold -> Histogram
                 for (int j = 0; j < 4; j++)
                 {
@@ -113,7 +120,6 @@ namespace Otsus_Algorithm
                         }
                     }
                 }
-                otsufied.Save(path + "\\" + Path.GetFileNameWithoutExtension(filename) + "-otsufied" + Path.GetExtension(filename));
                 histogram.Save(path + "\\" + Path.GetFileNameWithoutExtension(filename) + "-histogram" + Path.GetExtension(filename));
                 Console.WriteLine("Best Threshhold: " + bestThreshhold);
 
@@ -126,25 +132,27 @@ namespace Otsus_Algorithm
             Console.WriteLine(sw.Elapsed);
         }
 
+        // Preprocesses Image, returns 2D Array with grayscale(0-255) values for each pixel
         private static int[,] preprocess(Bitmap img)
         {
             int rgb;
             Color c;
-            int[,] imgarray = new int[img.Width, img.Height];
-            Bitmap save = new Bitmap(img.Width, img.Height);
+            int[,] grayscaleArray = new int[img.Width, img.Height];
+            Bitmap grayscale = new Bitmap(img.Width, img.Height);
 
+            // Pixel for pixel, saves grayscale image
             for (int y = 0; y < img.Height; y++)
             {
                 for (int x = 0; x < img.Width; x++)
                 {
                     c = img.GetPixel(x, y);
                     rgb = (int)Math.Round(.299 * c.R + .587 * c.G + .114 * c.B);
-                    imgarray[x, y] = rgb;
-                    save.SetPixel(x, y, Color.FromArgb(rgb, rgb, rgb));
+                    grayscaleArray[x, y] = rgb;
+                    grayscale.SetPixel(x, y, Color.FromArgb(rgb, rgb, rgb));
                 }
             }
-            save.Save(path + "\\" + Path.GetFileNameWithoutExtension(filename) + "-grayscale" + Path.GetExtension(filename));
-            return imgarray;
+            grayscale.Save(path + "\\" + Path.GetFileNameWithoutExtension(filename) + "-grayscale" + Path.GetExtension(filename));
+            return grayscaleArray;
         }
 
         // Calculates Effectiveness of given Threshhold
@@ -160,20 +168,24 @@ namespace Otsus_Algorithm
             pk2 = 1 - pk1;
             meank = meank1;
             meank1 /= pk1;
-            //Console.WriteLine("P(k):" + pk1.ToString("G"));
-            //Console.WriteLine("Mean1(K):" + meank1.ToString("G"));
-            //Console.WriteLine("Mean(k):" + meank.ToString("G"));
 
             for (int i = 0; i < lightmax; i++)
             {
                 meang += i * lightlevels[i];
             }
-            //Console.WriteLine("MeanG:" + meang.ToString("G"));
             meank2 = (meang - (pk1 * meank1)) / pk2;
-            //Console.WriteLine("Mean2(k):" + meank2.ToString("G"));
-            //Console.WriteLine("Proof of Stuff:" + (pk1 * meank1 + pk2 * meank2).ToString("G"));
             double effectiveness = pk1 * pk2 * Math.Pow(meank1 - meank2, 2);
-            //Console.WriteLine("Effectiveness:" + effectiveness.ToString("G"));
+
+            // Logs every Calculation, if wanted
+            if(logEverything)
+            {
+                Console.WriteLine("P(k):" + pk1.ToString("G"));
+                Console.WriteLine("Mean1(K):" + meank1.ToString("G"));
+                Console.WriteLine("Mean(k):" + meank.ToString("G"));
+                Console.WriteLine("MeanG:" + meang.ToString("G"));
+                Console.WriteLine("Mean2(k):" + meank2.ToString("G"));
+                Console.WriteLine("Effectiveness:" + effectiveness.ToString("G"));
+            }
             if (!Double.IsNaN(effectiveness) && !Double.IsInfinity(effectiveness))
             {
                 return effectiveness;
