@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.452
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Otsus Algorithm", "Otsus Algorithm\Otsus Algorithm.csproj", "{918183E2-0496-4279-8CED-E859F3E853CF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{918183E2-0496-4279-8CED-E859F3E853CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{918183E2-0496-4279-8CED-E859F3E853CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{918183E2-0496-4279-8CED-E859F3E853CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{918183E2-0496-4279-8CED-E859F3E853CF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FF37BB05-6C55-4C7E-8917-7047CD97B96F}
+	EndGlobalSection
+EndGlobal
