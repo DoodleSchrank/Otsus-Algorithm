@@ -158,32 +158,38 @@ namespace Otsus_Algorithm
         // Calculates Effectiveness of given Threshhold
         private static double calcEffectiveness(int threshhold)
         {
-            double pk1, pk2, meank1, meank2, meank, meang;
-            pk1 = meank1 = meang = 0;
+            double pk1, pk2, meank1, meank2, meang;
+            pk1 = pk2 = meank1 = meank2 = meang = 0;
             for (int i = 0; i <= threshhold; i++)
             {
                 pk1 += lightlevels[i];
                 meank1 += i * lightlevels[i];
             }
-            pk2 = 1 - pk1;
-            meank = meank1;
-            meank1 /= pk1;
-
+            for (int i = threshhold; i < lightmax; i++)
+            {
+                pk2 += lightlevels[i];
+                meank2 += i * lightlevels[i];
+            }
             for (int i = 0; i < lightmax; i++)
             {
                 meang += i * lightlevels[i];
             }
-            meank2 = (meang - (pk1 * meank1)) / pk2;
+
+            meank1 /= pk1;
+            meank2 /= pk2;
+
+            //oldstuff
+            //pk2 = 1 - pk1;
+            //meank2 = (meang - (pk1 * meank1)) / pk2;
             double effectiveness = pk1 * pk2 * Math.Pow(meank1 - meank2, 2);
+            Console.WriteLine("Mean1(K):" + meank1.ToString("G"));
+            Console.WriteLine("Mean2(k):" + meank2.ToString("G"));
 
             // Logs every Calculation, if wanted
-            if(logEverything)
+            if (logEverything)
             {
                 Console.WriteLine("P(k):" + pk1.ToString("G"));
-                Console.WriteLine("Mean1(K):" + meank1.ToString("G"));
-                Console.WriteLine("Mean(k):" + meank.ToString("G"));
                 Console.WriteLine("MeanG:" + meang.ToString("G"));
-                Console.WriteLine("Mean2(k):" + meank2.ToString("G"));
                 Console.WriteLine("Effectiveness:" + effectiveness.ToString("G"));
             }
             if (!Double.IsNaN(effectiveness) && !Double.IsInfinity(effectiveness))
